@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Box,
   Stack,
@@ -20,6 +20,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import InventoryTable from "./ui/InventoryTable";
+import { Camera } from "react-camera-pro";
 
 const style = {
   position: "absolute",
@@ -42,10 +43,22 @@ interface InventoryItem {
   [key: string]: any;
 }
 
+const errorMessages = {
+  noCameraAccessible:
+    "No camera device accessible. Please connect your camera or try a different browser.",
+  permissionDenied:
+    "Permission denied. Please refresh and give camera permission.",
+  switchCamera:
+    "It is not possible to switch camera to different one because there is only one video device accessible.",
+  canvas: "Canvas is not supported.",
+};
+
 export default function Home() {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [open, setOpen] = useState(false);
   const [itemName, setItemName] = useState("");
+  const camera = useRef<any>();
+  const [image, setImage] = useState(null);
 
   const addItem = async (item: any) => {
     const docRef = doc(collection(firestore, "inventory"), item);
@@ -110,25 +123,37 @@ export default function Home() {
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Add Item
           </Typography>
-          <Stack width="100%" direction={"row"} spacing={2}>
-            <TextField
-              id="outlined-basic"
-              label="Item"
-              variant="outlined"
-              fullWidth
-              value={itemName}
-              onChange={(e) => setItemName(e.target.value)}
-            />
-            <Button
-              variant="outlined"
-              onClick={() => {
-                addItem(itemName);
-                setItemName("");
-                handleClose();
-              }}
-            >
-              Add
-            </Button>
+          <Stack width="100%" spacing={2}>
+            <Box display={"flex"}>
+              <TextField
+                id="outlined-basic"
+                label="Item"
+                variant="outlined"
+                fullWidth
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
+              />
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  addItem(itemName);
+                  setItemName("");
+                  handleClose();
+                }}
+              >
+                Add
+              </Button>
+            </Box>
+            <Box display={"flex"}>
+              <Camera
+                ref={camera}
+                aspectRatio={1}
+                errorMessages={errorMessages}
+              />
+              <Button onClick={() => setImage(camera.current.takePhoto())}>
+                Take photo
+              </Button>
+            </Box>
           </Stack>
         </Box>
       </Modal>

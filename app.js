@@ -19,7 +19,7 @@ const response = await openai.chat.completions.create({
       content: [
         {
           type: "text",
-          text: "Describe this image",
+          text: "Return the name of this food item. Return 'not food' if it is not food",
         },
         {
           type: "image_url",
