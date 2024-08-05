@@ -19,6 +19,7 @@ import {
   deleteDoc,
   getDoc,
 } from "firebase/firestore";
+import InventoryTable from "./ui/InventoryTable";
 
 const style = {
   position: "absolute",
@@ -35,8 +36,14 @@ const style = {
   gap: 3,
 };
 
+interface InventoryItem {
+  name: string;
+  quantity: number;
+  [key: string]: any;
+}
+
 export default function Home() {
-  const [inventory, setInventory] = useState([]);
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [open, setOpen] = useState(false);
   const [itemName, setItemName] = useState("");
 
@@ -128,44 +135,20 @@ export default function Home() {
       <Button variant="contained" onClick={handleOpen}>
         Add New Item
       </Button>
-      <Box border={"1px solid #333"}>
+      <Box>
         <Box
           width="800px"
           height="100px"
-          bgcolor={"#ADD8E6"}
           display={"flex"}
           justifyContent={"center"}
           alignItems={"center"}
         >
-          <Typography variant={"h2"} color={"#333"} textAlign={"center"}>
+          <Typography variant={"h2"} color={"white"}>
             Inventory Items
           </Typography>
         </Box>
         <Stack width="800px" height="300px" spacing={2} overflow={"auto"}>
-          {inventory.map(
-            ({ name, quantity }: { name: string; quantity: number }) => (
-              <Box
-                key={name}
-                width="100%"
-                minHeight="150px"
-                display={"flex"}
-                justifyContent={"space-between"}
-                alignItems={"center"}
-                bgcolor={"#f0f0f0"}
-                paddingX={5}
-              >
-                <Typography variant={"h3"} color={"#333"} textAlign={"center"}>
-                  {name.charAt(0).toUpperCase() + name.slice(1)}
-                </Typography>
-                <Typography variant={"h3"} color={"#333"} textAlign={"center"}>
-                  Quantity: {quantity}
-                </Typography>
-                <Button variant="contained" onClick={() => removeItem(name)}>
-                  Remove
-                </Button>
-              </Box>
-            )
-          )}
+          <InventoryTable data={inventory} removeItem={removeItem} />
         </Stack>
       </Box>
     </Box>
